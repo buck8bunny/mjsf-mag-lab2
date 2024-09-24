@@ -1,7 +1,18 @@
-<script setup>
-import { defineProps, defineEmits } from 'vue';
+<template>
+  <button
+    :class="buttonClasses"
+    @click="handleClick"
+  >
+    <span v-if="icon" class="mr-2">
+      <i :class="icon"></i>
+    </span>
+    {{ label }}
+  </button>
+</template>
 
-// Приймаємо пропси
+<script setup>
+import { defineProps, computed, ref } from 'vue';
+
 const props = defineProps({
   label: {
     type: String,
@@ -10,48 +21,45 @@ const props = defineProps({
   color: {
     type: String,
     default: 'blue',
+    validator: (value) => ['red', 'blue', 'green', 'yellow', 'purple'].includes(value),
   },
   size: {
     type: String,
     default: 'medium',
+    validator: (value) => ['small', 'medium', 'large'].includes(value),
   },
   icon: {
     type: String,
-    default: null,
+    default: '',
   },
 });
 
-// Обробка події натискання
-const emit = defineEmits(['click']);
+// Обчислення класів для кнопки
+const buttonClasses = computed(() => {
+  const sizeClasses = {
+    small: 'px-2 py-1 text-sm',
+    medium: 'px-4 py-2 text-base',
+    large: 'px-6 py-3 text-lg',
+  };
 
-// Мапінг розмірів на класи Tailwind
-const sizeClasses = {
-  small: 'py-1 px-3 text-sm',
-  medium: 'py-2 px-4 text-base',
-  large: 'py-3 px-6 text-lg',
-};
+  const colorClasses = {
+    red: 'bg-red-500 text-white hover:bg-red-600',
+    blue: 'bg-blue-500 text-white hover:bg-blue-600',
+    green: 'bg-green-500 text-white hover:bg-green-600',
+    yellow: 'bg-yellow-500 text-black hover:bg-yellow-600',
+    purple: 'bg-purple-500 text-white hover:bg-purple-600',
+  };
 
-// Мапінг кольорів на класи Tailwind
-const colorClasses = {
-  red: 'bg-red-500 hover:bg-red-600 text-white',
-  blue: 'bg-blue-500 hover:bg-blue-600 text-white',
-  green: 'bg-green-500 hover:bg-green-600 text-white',
+  return `${sizeClasses[props.size]} ${colorClasses[props.color]} rounded focus:outline-none focus:ring-2 focus:ring-opacity-50`;
+});
+
+// Реактивна змінна для повідомлення
+const message = ref('');
+
+const handleClick = () => {
+  message.value = 'Кнопка натиснута!';
 };
 </script>
 
-<template>
-  <button
-    :class="`flex items-center justify-center rounded ${sizeClasses[size]} ${colorClasses[color]} focus:outline-none focus:ring-2 focus:ring-offset-2`"
-    @click="$emit('click')"
-  >
-    <!-- Якщо є іконка, виводимо її -->
-    <span v-if="icon" :class="`mr-2 material-icons`">{{ icon }}</span>
-    {{ label }}
-  </button>
-</template>
-
 <style scoped>
-.material-icons {
-  font-size: 1.25em;
-}
 </style>
